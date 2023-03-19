@@ -1,0 +1,226 @@
+var token = "Insira o Token do seu Bot";
+var telegramUrl = "https://api.telegram.org/bot" + token;
+var webAppUrl = "Adicione o Link criado após implantar seu projeto";
+
+function copydata() {
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var nowDate = new Date(); 
+var date = nowDate.getMonth()+1;
+var date2 = nowDate.getFullYear();
+var sheet1 = ss.getSheetByName("Carteira").getRange("B2").getValue();
+var sheet2 = ss.getSheetByName("Carteira").getRange("B3").getValue();
+var sheet3 = ss.getSheetByName("Carteira").getRange("B4").getValue();
+var sheet4 = ss.getSheetByName("Carteira").getRange("B5").getValue();
+var sheet5 = ss.getSheetByName("Carteira").getRange("B6").getValue();
+var sheet6 = ss.getSheetByName("Carteira").getRange("B7").getValue();
+var sheet7 = ss.getSheetByName("Carteira").getRange("B8").getValue();
+var sheet8 = ss.getSheetByName("Carteira").getRange("B9").getValue();
+var sheet9 = ss.getSheetByName("Carteira").getRange("B10").getValue();
+var sheet10 = ss.getSheetByName("Carteira").getRange("B11").getValue();
+var sheet11 = ss.getSheetByName("Carteira").getRange("B12").getValue();
+var sheet12 = ss.getSheetByName("Carteira").getRange("B13").getValue();
+var sheet13 = ss.getSheetByName("Carteira").getRange("B14").getValue();
+var sheet14 = ss.getSheetByName("Carteira").getRange("B15").getValue();
+var sheet15 = ss.getSheetByName("Histórico");
+sheet15.appendRow([date+"/"+date2,sheet1,sheet2,sheet3,sheet4,sheet5,sheet6,sheet7,sheet8,sheet9,sheet10,sheet11,sheet12,sheet13,sheet14]);
+}
+
+function inArray(target, array) {
+  for(var a = 0; a < array.length; a++)  {
+    if(array[a] == target) {
+      return true; }
+     }
+      return false; 
+     }
+
+function getMe() {
+  var url = telegramUrl + "/getMe";
+  var response = UrlFetchApp.fetch(url);}
+
+function doGet(e) {
+  return HtmlService.createHtmlOutput("Olá");}
+
+function setWebhook() {
+  var url = telegramUrl + "/setWebhook?url=" + webAppUrl;
+  var response = UrlFetchApp.fetch(url);
+  
+}
+
+function sendText(chatId, text, keyBoard) {
+  var data = {
+    method: "post",
+    payload: {
+      method: "sendMessage",
+      chat_id: String(chatId),
+      text: text,
+      parse_mode: "HTML",
+      reply_markup: JSON.stringify(keyBoard)
+    }
+  };
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/', data);
+}
+
+function sendTexto(chatIdf,textf) {
+  var urlf = telegramUrl + "/sendMessage?chat_id=" + chatIdf + "&text=" + textf;
+  var response = UrlFetchApp.fetch(urlf);}
+
+
+function sendPhoto(chat_id, outputUrl) { 
+  var url = telegramUrl + "/sendPhoto?chat_id=" + chat_id + "&photo=" + outputUrl; 
+  var response = UrlFetchApp.fetch(url); }
+
+
+function doPost(e) {
+//parse user data
+var contents = JSON.parse(e.postData.contents);
+
+//set spreadsheet 
+var ssId = "1Yyu-ZqAEGADM-d8fP34B-SuEgGbAlm23_Ql9X9UzVg8";
+var expenseSheetca =  SpreadsheetApp.openById(ssId).getSheetByName("Carteira");
+var expenseSheetcr =  SpreadsheetApp.openById(ssId).getSheetByName("Criptos");
+var expenseSheetfu =  SpreadsheetApp.openById(ssId).getSheetByName("Fundos");
+var expenseSheetac =  SpreadsheetApp.openById(ssId).getSheetByName("Ações");
+var expenseSheetas =  SpreadsheetApp.openById(ssId).getSheetByName("Stocks");
+var expenseSheetre =  SpreadsheetApp.openById(ssId).getSheetByName("Reits");
+var expenseSheetet =  SpreadsheetApp.openById(ssId).getSheetByName("ETF");
+
+  var keyBoard = {
+        "keyboard": [
+       [ 
+         "Ações",
+         "FII"
+       ],
+       [
+         "Stocks",
+         "Reits"
+       ],
+       [
+         "Cripto",
+         "Resumo"
+       ],
+       [ 
+         "ETF",
+         "Gráfico"
+       ]
+     ],
+     resize_keyboard:true,
+     one_time_keyboard:true
+  };
+
+    if (contents.message) {
+    var chatId = contents.message.chat.id;
+    var id_message = contents.message.chat.id; 
+    var text = contents.message.text; 
+    var firstName = contents.message.from.first_name;
+    if (contents.message.text === "/cancel") {
+      removeChatId(chatId);
+    } else {
+      storeChatId(chatId);
+    }
+
+
+function storeChatId(chatId, firstName) {
+  var firstName = contents.message.from.first_name;
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Chat IDs");
+  var chatIds = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues().flat();
+  if (chatIds.indexOf(chatId) === -1) {
+    sheet.appendRow([chatId, firstName]);
+  }
+}
+
+function removeChatId(chatId) {
+  var sheet = SpreadsheetApp.getActive().getSheetByName("Chat IDs");
+  var chatIds = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues().flat();
+  var index = chatIds.indexOf(chatId);
+  if (index !== -1) {
+    sheet.deleteRow(index + 1);
+  }
+}
+    switch(text) {
+                      
+        case '/menu':
+                              sendText(id_message, "Olá " + firstName +  ", selecione uma opção:",keyBoard); break;
+
+        case 'Cripto':      var cripto = expenseSheetcr.getRange("D1:D26").getValues();
+                              for (var b = 0; b < cripto.length; b++){       
+                              sendTexto(id_message,encodeURI(cripto[b]), {parse_mode: 'HTML'})}; break;
+
+        case 'FII':
+                              var fundos = expenseSheetfu.getRange("D1:D9").getValues();
+                              for (var c = 0; c < fundos.length; c++){       
+                              sendTexto(id_message,encodeURI(fundos[c]), {parse_mode: 'HTML'})}; break;
+                              
+        case 'Ações':
+                              var acoes = expenseSheetac.getRange("D1:D12").getValues();
+                              for (var d = 0; d < acoes.length; d++){       
+                              sendTexto(id_message,encodeURI(acoes[d]), {parse_mode: 'HTML'})}; break;
+
+        case 'Stocks':
+                              var stocks = expenseSheetas.getRange("D1:D29").getValues();
+                              for (var s = 0; s < stocks.length; s++){       
+                              sendTexto(id_message,encodeURI(stocks[s]), {parse_mode: 'HTML'})}; break;
+
+        case 'Reits':
+                              var reits = expenseSheetre.getRange("D1:D30").getValues();
+                              for (var r = 0; r < reits.length; r++){       
+                              sendTexto(id_message,encodeURI(reits[r]), {parse_mode: 'HTML'})}; break;
+        case 'ETF':
+                              var etf = expenseSheetet.getRange("D1:D30").getValues();
+                              for (var a = 0; a < etf.length; a++){       
+                              sendTexto(id_message,encodeURI(etf[a]), {parse_mode: 'HTML'})}; break;                                  
+        case 'Resumo':
+                              expenseSheetca.getRange('D2:D16').copyTo(expenseSheetca.getRange('C2:C16'),SpreadsheetApp.CopyPasteType.PASTE_VALUES, false);
+                              var resumo = expenseSheetca.getRange("C1:C16").getValues();
+                              for (var e = 0; e < resumo.length; e++){       
+                              sendTexto(id_message,encodeURI(resumo[e]), {parse_mode: 'HTML'})}; break;
+
+        case 'Gráfico':
+                              const urlf = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=1613544162&format=image";
+                              const resf = UrlFetchApp.fetch(urlf);
+                              const filef = DriveApp.createFile(resf.getBlob());
+                              const outputUrlf = Drive.Files.get(filef.getId()).thumbnailLink.replace("=s220", "=s1000");
+
+                              const urla = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=1222388128&format=image";
+                              const resa = UrlFetchApp.fetch(urla);
+                              const filea = DriveApp.createFile(resa.getBlob());
+                              const outputUrla = Drive.Files.get(filea.getId()).thumbnailLink.replace("=s220", "=s1000");
+
+                              const urlc = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=1681575309&format=image";
+                              const resc = UrlFetchApp.fetch(urlc);
+                              const filec = DriveApp.createFile(resc.getBlob());
+                              const outputUrlc = Drive.Files.get(filec.getId()).thumbnailLink.replace("=s220", "=s1000");
+
+                              const urlg = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=1583844319&format=image";
+                              const resg = UrlFetchApp.fetch(urlg);
+                              const fileg = DriveApp.createFile(resg.getBlob());
+                              const outputUrlg = Drive.Files.get(fileg.getId()).thumbnailLink.replace("=s220", "=s1000");
+
+                            const urlb = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=221576218&format=image";
+                              const resb = UrlFetchApp.fetch(urlb);
+                              const fileb = DriveApp.createFile(resb.getBlob());
+                              const outputUrlb = Drive.Files.get(fileb.getId()).thumbnailLink.replace("=s220", "=s1000");
+
+                              const urlh = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=2104156028&format=image";
+                              const resh = UrlFetchApp.fetch(urlh);
+                              const fileh = DriveApp.createFile(resh.getBlob());
+                              const outputUrlh = Drive.Files.get(fileh.getId()).thumbnailLink.replace("=s220", "=s1000");    
+
+                              const urlr = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOLSJuxsKlR9IHs-Bn-eMBdQ9PRzLZIJeAUy_goswGIuFnDS1LOSFL3E__bOwTkHFHEdzvoPjsUNIV/pubchart?oid=1428152104&format=image";
+                              const resr = UrlFetchApp.fetch(urlr);
+                              const filer = DriveApp.createFile(resr.getBlob());
+                              const outputUrlr = Drive.Files.get(filer.getId()).thumbnailLink.replace("=s220", "=s1000"); 
+
+                              sendPhoto(id_message, outputUrla, {parse_mode: 'HTML'}); 
+                              sendPhoto(id_message, outputUrlf, {parse_mode: 'HTML'}); 
+                              sendPhoto(id_message, outputUrlc, {parse_mode: 'HTML'}); 
+                              sendPhoto(id_message, outputUrlh, {parse_mode: 'HTML'});
+                              sendPhoto(id_message, outputUrlr, {parse_mode: 'HTML'});
+                              sendPhoto(id_message, outputUrlb, {parse_mode: 'HTML'}); 
+                              sendPhoto(id_message, outputUrlg, {parse_mode: 'HTML'}); break;
+
+        case text:
+                              sendText(id_message, "Olá " + firstName +  ", selecione uma opção:",keyBoard); break;
+
+   } 
+}
+}
